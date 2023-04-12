@@ -2,6 +2,7 @@ package de.codingair.tradesystem.spigot.trade;
 
 import de.codingair.tradesystem.spigot.trade.gui.layout.types.impl.economy.EconomyIcon;
 import de.codingair.tradesystem.spigot.utils.Lang;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -36,10 +37,10 @@ public class PlayerTradeResult extends TradeResult {
                 ItemMeta meta = item.getItemMeta();
                 assert meta != null;
 
-                if (meta.hasDisplayName()) return formatName(item.getType().name()) + " (" + meta.getDisplayName() + ")";
+                if (meta.hasDisplayName()) return ChatColor.stripColor(meta.getDisplayName());
             }
 
-            return formatName(item.getType().name());
+            return properName(item.getType().name());
         };
     }
 
@@ -116,19 +117,32 @@ public class PlayerTradeResult extends TradeResult {
         return lines;
     }
 
-    @NotNull
-    public static String formatName(@NotNull String name) {
-        StringBuilder b = new StringBuilder(name.toLowerCase());
+    /**
+     * Returns a capitalized version of the given string with underscores replaced with spaces.
+     *
+     * @param input the input string to be converted.
+     * @return a capitalized version of the input string.
+     */
+    public static String properName(final String input) {
+        return capitalized(input.replace("_", " "));
+    }
 
-        int i = 0;
-        do {
-            b.replace(i, i + 1, b.substring(i, i + 1).toUpperCase());
-            i = b.indexOf("_", i);
-            if (i >= 0) b.replace(i, i + 1, " ");
-            i++;
-        } while (i > 0 && i < b.length());
-
-        return b.toString().trim();
+    /**
+     * Returns a capitalized version of the given string with the first letter of each word capitalized
+     * and all other letters in lowercase.
+     *
+     * @param input the input string to be capitalized.
+     * @return a capitalized version of the input string.
+     */
+    public static String capitalized(final String input) {
+        final StringBuilder builder = new StringBuilder();
+        final String[] words = input.split(" ");
+        for (final String word : words) {
+            builder.append(word.charAt(0))
+                    .append(word.substring(1).toLowerCase())
+                    .append(" ");
+        }
+        return builder.toString().trim();
     }
 
     /**
